@@ -11,66 +11,329 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-
-// Get a reference to the database
 const db = firebase.database();
 
-// Add Data to Realtime Database
-if (document.getElementById("addEntryForm")) {
-    const addEntryForm = document.getElementById("addEntryForm");
+// Fetch and Update Dashboard Data
+async function fetchAndUpdateDashboard() {
+    try {
+        const entriesSnapshot = await db.ref("entries").once("value");
+        const pharmaciesSnapshot = await db.ref("pharmacies").once("value");
 
-    addEntryForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        const entries = entriesSnapshot.exists() ? Object.values(entriesSnapshot.val()) : [];
+        const pharmacies = pharmaciesSnapshot.exists() ? Object.values(pharmaciesSnapshot.val()) : [];
 
-        const teamName = document.getElementById("teamName").value;
-        const province = document.getElementById("province").value;
-        const pharmacyName = document.getElementById("pharmacyName").value;
-        const contactNumber = document.getElementById("contactNumber").value;
-        const address = document.getElementById("address").value;
+        // Update Total Counts
+        document.getElementById("preRegisteredEntries").textContent = entries.length;
+        document.getElementById("newEntries").textContent = pharmacies.length;
 
-        const skuInputs = document.querySelectorAll(".sku-input");
-        const salesQty = Array.from(skuInputs).map((input) => ({
-            name: input.dataset.sku,
-            count: input.value,
-        }));
+        // Update Dashboard Details
+        updateTeamPerformance(entries, pharmacies);
+        updateProvincePerformance(entries, pharmacies);
+        createTeamCharts(entries, pharmacies);
+        createProvinceCharts(entries, pharmacies);
+    } catch (error) {
+        console.error("Error fetching data from Firebase:", error.message);
+        alert(`Failed to load data from Firebase: ${error.message}`);
+    }
+}
 
-        const newEntry = { teamName, province, pharmacyName, contactNumber, address, salesQty };
+// Update Team Performance Table
+function updateTeamPerformance(entries, pharmacies) {
+    const teamPerformance = {};
 
-        try {
-            await db.ref("entries").push(newEntry);
-            alert("Entry added successfully!");
-            addEntryForm.reset();
-        } catch (error) {
-            console.error("Error adding entry:", error);
-            alert("Failed to add entry.");
+    [...entries, ...pharmacies].forEach((entry) => {
+        const teamName = entry.teamName || "Unknown";
+        const province = entry.province || "Unknown";
+
+        if (!teamPerformance[teamName]) {
+            teamPerformance[teamName] = { count: 0, provinces: new Set() };
         }
+
+        teamPerformance[teamName].count++;
+        teamPerformance[teamName].provinces.add(province);
+    });
+
+    const teamTableBody = document.getElementById("teamPerformanceTable");
+    teamTableBody.innerHTML = Object.entries(teamPerformance)
+        .map(
+            ([team, data]) =>
+                `<tr><td>${team}</td><td>${data.count}</td><td>${Array.from(data.provinces).join(", ")}</td></tr>`
+        )
+        .join("");
+}
+
+// Update Province Performance Table
+function updateProvincePerformance(entries, pharmacies) {
+    const provincePerformance = {};
+
+    [...entries, ...pharmacies].forEach((entry) => {
+        const province = entry.province || "Unknown";
+        const teamName = entry.teamName || "Unknown";
+
+        if (!provincePerformance[province]) {
+            provincePerformance[province] = { count: 0, teams: new Set() };
+        }
+
+        provincePerformance[province].count++;
+        provincePerformance[province].teams.add(teamName);
+    });
+
+    const provinceTableBody = document.getElementById("provincePerformanceTable");
+    provinceTableBody.innerHTML = Object.entries(provincePerformance)
+        .map(
+            ([province, data]) =>
+                `<tr><td>${province}</td><td>${data.count}</td><td>${Array.from(data.teams).join(", ")}</td></tr>`
+        )
+        .join("");
+}
+
+// Create Team Charts
+function createTeamCharts(entries, pharmacies) {
+    const preRegisteredCounts = {};
+    const newCounts = {};
+
+    entries.forEach((entry) => {
+        preRegisteredCounts[entry.teamName] = (preRegisteredCounts[entry.teamName] || 0) + 1;
+    });
+
+    pharmacies.forEach((pharmacy) => {
+        newCounts[pharmacy.teamName] = (newCounts[pharmacy.teamName] || 0) + 1;
+    });
+
+    createPieChart("preRegisteredTeamChart", preRegisteredCounts, "Pre-Registered Pharmacies by Team");
+    createPieChart("newPharmaciesTeamChart", newCounts, "New Pharmacies by Team");
+}
+
+// Create Province Charts
+function createProvinceCharts(entries, pharmacies) {
+    const preRegisteredCounts = {};
+    const newCounts = {};
+
+    entries.forEach((entry) => {
+        preRegisteredCounts[entry.province] = (preRegisteredCounts[entry.province] || 0) + 1;
+    });
+
+    pharmacies.forEach((pharmacy) => {
+        newCounts[pharmacy.province] = (newCounts[pharmacy.province] || 0) + 1;
+    });
+
+    createPieChart("preRegisteredProvinceChart", preRegisteredCounts, "Pre-Registered Pharmacies by Province");
+    createPieChart("newPharmaciesProvinceChart", newCounts, "New Pharmacies by Province");
+}
+
+// Function to Create Pie Chart
+function createPieChart(chartId, dataCounts, title) {
+    const ctx = document.getElementById(chartId).getContext("2d");
+
+    if (Chart.getChart(chartId)) {
+        Chart.getChart(chartId).destroy();
+    }
+
+    const labels = Object.keys(dataCounts);
+    const data = Object.values(dataCounts);
+
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    data: data,
+                    backgroundColor: generateColors(labels.length),
+                },
+            ],
+        },
+        options: {
+            plugins: {
+                legend: { position: "bottom" },
+                title: { display: true, text: title },
+            },
+        },
     });
 }
 
-// Fetch Data from Realtime Database
-if (document.getElementById("dashboardTable")) {
-    const dashboardTable = document.getElementById("dashboardTable").getElementsByTagName("tbody")[0];
+// Generate Colors for Charts
+function generateColors(count) {
+    const baseColors = ["#1CA498", "#B51F67", "#FAD968"]; // Base colors
+    const shades = [];
 
-    db.ref("entries").on("value", (snapshot) => {
-        if (!snapshot.exists()) {
-            console.log("No data available in Firebase.");
-            return;
+    // Generate shades for each base color
+    for (let i = 0; i < count; i++) {
+        const baseColor = baseColors[i % baseColors.length]; // Cycle through base colors
+        const shadeFactor = 1 - (i % baseColors.length) * 0.1; // Reduce brightness for each shade
+        const shade = adjustBrightness(baseColor, shadeFactor);
+        shades.push(shade);
+    }
+
+    return shades;
+}
+
+// Adjust the brightness of a color
+function adjustBrightness(color, factor) {
+    const rgb = hexToRgb(color);
+    const adjustedRgb = rgb.map((channel) => Math.min(255, Math.floor(channel * factor)));
+    return rgbToHex(adjustedRgb[0], adjustedRgb[1], adjustedRgb[2]);
+}
+
+// Convert hex color to RGB
+function hexToRgb(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+}
+
+// Convert RGB to hex color
+function rgbToHex(r, g, b) {
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+}
+
+
+// Initialize the Dashboard
+fetchAndUpdateDashboard();
+
+
+// Get references to the new pharmacy button and forms
+const newPharmacyBtn = document.getElementById("newPharmacyBtn");
+const addPharmacyForm = document.getElementById("addPharmacyForm");
+const addEntryForm = document.getElementById("addEntryForm");
+
+// Show the New Pharmacy Form
+newPharmacyBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    addEntryForm.style.display = "none";
+    addPharmacyForm.style.display = "block";
+});
+
+// Handle New Pharmacy Form Submission
+addPharmacyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const teamName = document.getElementById("pharmacyTeamName").value;
+    const pharmacyName = document.getElementById("newPharmacyName").value;
+    const contactNumber = document.getElementById("newPharmacyContact").value;
+    const address = document.getElementById("newPharmacyAddress").value;
+
+    const newPharmacy = { teamName, pharmacyName, contactNumber, address };
+
+    try {
+        await db.ref("pharmacies").push(newPharmacy);
+        alert("New Pharmacy added successfully!");
+        addPharmacyForm.reset();
+        addPharmacyForm.style.display = "none";
+        addEntryForm.style.display = "block";
+    } catch (error) {
+        console.error("Error adding pharmacy:", error);
+        alert("Failed to add new pharmacy.");
+    }
+});
+
+// Fetch and Update Pre-Registered and New Pharmacies Data
+async function fetchAndUpdateDashboard() {
+    try {
+        const entriesSnapshot = await db.ref("entries").once("value");
+        const pharmaciesSnapshot = await db.ref("pharmacies").once("value");
+
+        const entries = entriesSnapshot.exists() ? Object.values(entriesSnapshot.val()) : [];
+        const pharmacies = pharmaciesSnapshot.exists() ? Object.values(pharmaciesSnapshot.val()) : [];
+
+        // Update Total Counts
+        document.getElementById("preRegisteredEntries").textContent = entries.length;
+        document.getElementById("newEntries").textContent = pharmacies.length;
+
+        // Update Charts and Tables
+        updateTeamPerformance(entries, pharmacies);
+        updateProvincePerformance(entries, pharmacies);
+        createTeamCharts(entries, pharmacies);
+        createProvinceCharts(entries, pharmacies);
+    } catch (error) {
+        console.error("Error fetching data from Firebase:", error.message);
+        alert(`Failed to load data from Firebase: ${error.message}`);
+    }
+}
+
+// Update Team Performance Table
+function updateTeamPerformance(entries, pharmacies) {
+    const teamPerformance = {};
+
+    [...entries, ...pharmacies].forEach((entry) => {
+        const teamName = entry.teamName || "Unknown";
+        const province = entry.province || "Unknown";
+
+        if (!teamPerformance[teamName]) {
+            teamPerformance[teamName] = { count: 0, provinces: new Set() };
         }
 
-        const entries = snapshot.val();
-        const formattedEntries = Object.values(entries);
-
-        dashboardTable.innerHTML = "";
-        formattedEntries.forEach((entry) => {
-            const row = dashboardTable.insertRow();
-            row.innerHTML = `
-                <td>${entry.teamName}</td>
-                <td>${entry.province}</td>
-                <td>${entry.pharmacyName}</td>
-                <td>${entry.contactNumber}</td>
-                <td>${entry.address}</td>
-                <td>${entry.salesQty.map((sku) => `${sku.name}: ${sku.count}`).join("<br>")}</td>
-            `;
-        });
+        teamPerformance[teamName].count++;
+        teamPerformance[teamName].provinces.add(province);
     });
+
+    const teamTableBody = document.getElementById("teamPerformanceTable");
+    teamTableBody.innerHTML = Object.entries(teamPerformance)
+        .map(
+            ([team, data]) =>
+                `<tr><td>${team}</td><td>${data.count}</td><td>${Array.from(data.provinces).join(", ")}</td></tr>`
+        )
+        .join("");
 }
+
+// Update Province Performance Table
+function updateProvincePerformance(entries, pharmacies) {
+    const provincePerformance = {};
+
+    [...entries, ...pharmacies].forEach((entry) => {
+        const province = entry.province || "Unknown";
+        const teamName = entry.teamName || "Unknown";
+
+        if (!provincePerformance[province]) {
+            provincePerformance[province] = { count: 0, teams: new Set() };
+        }
+
+        provincePerformance[province].count++;
+        provincePerformance[province].teams.add(teamName);
+    });
+
+    const provinceTableBody = document.getElementById("provincePerformanceTable");
+    provinceTableBody.innerHTML = Object.entries(provincePerformance)
+        .map(
+            ([province, data]) =>
+                `<tr><td>${province}</td><td>${data.count}</td><td>${Array.from(data.teams).join(", ")}</td></tr>`
+        )
+        .join("");
+}
+
+// Create Team Charts for Pre-Registered and New Pharmacies
+function createTeamCharts(entries, pharmacies) {
+    const preRegisteredCounts = {};
+    const newCounts = {};
+
+    entries.forEach((entry) => {
+        preRegisteredCounts[entry.teamName] = (preRegisteredCounts[entry.teamName] || 0) + 1;
+    });
+
+    pharmacies.forEach((pharmacy) => {
+        newCounts[pharmacy.teamName] = (newCounts[pharmacy.teamName] || 0) + 1;
+    });
+
+    createPieChart("preRegisteredTeamChart", preRegisteredCounts, "Pre-Registered Pharmacies by Team");
+    createPieChart("newPharmaciesTeamChart", newCounts, "New Pharmacies by Team");
+}
+
+// Create Province Charts for Pre-Registered and New Pharmacies
+function createProvinceCharts(entries, pharmacies) {
+    const preRegisteredCounts = {};
+    const newCounts = {};
+
+    entries.forEach((entry) => {
+        preRegisteredCounts[entry.province] = (preRegisteredCounts[entry.province] || 0) + 1;
+    });
+
+    pharmacies.forEach((pharmacy) => {
+        newCounts[pharmacy.province] = (newCounts[pharmacy.province] || 0) + 1;
+    });
+
+    createPieChart("preRegisteredProvinceChart", preRegisteredCounts, "Pre-Registered Pharmacies by Province");
+    createPieChart("newPharmaciesProvinceChart", newCounts, "New Pharmacies by Province");
+}
+
+// Function to Initialize the Dashboard
+fetchAndUpdateDashboard();
+

@@ -4,139 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feel Good Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-    
-        /* Navbar */
-        .navbar {
-            background-color: #1CA498; /* Main color */
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-        }
-    
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-    
-        /* Dashboard Table */
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background-color: #ffffff; /* Light background for the table */
-            border: 2px solid #1CA498; /* Main color for the table border */
-            border-radius: 8px;
-            overflow: hidden; /* Smooth rounded corners */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visibility */
-        }
-    
-        table th {
-            background-color: #1CA498; /* Main color */
-            color: white; /* White text for better contrast */
-            padding: 15px;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-    
-        table td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            color: #333; /* Dark gray text for readability */
-        }
-    
-        table tr:nth-child(even) {
-            background-color: #FAD968; /* Sub color for even rows */
-        }
-    
-        table tr:nth-child(odd) {
-            background-color: #ffffff; /* White for odd rows */
-        }
-    
-        table tr:hover {
-            background-color: #B51F67; /* Sub color for hover */
-            color: white; /* White text on hover */
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-    
-        /* Responsive Table for Tablets */
-        @media (max-width: 768px) {
-            table {
-                display: block;
-                overflow-x: auto; /* Add horizontal scrolling for smaller screens */
-                white-space: nowrap; /* Prevent wrapping of text */
-            }
-    
-            table th, table td {
-                font-size: 14px; /* Reduce font size for smaller screens */
-                padding: 10px; /* Adjust padding for better spacing */
-            }
-        }
-    
-        /* Responsive Table for Mobile Phones */
-        @media (max-width: 480px) {
-            table {
-                display: block;
-                overflow-x: auto; /* Enable horizontal scrolling */
-                white-space: nowrap;
-            }
-    
-            table th, table td {
-                font-size: 12px; /* Further reduce font size */
-                padding: 8px;
-            }
-    
-            /* Adjust spacing for smaller phones */
-            table th {
-                text-align: left;
-            }
-    
-            table td {
-                text-align: left;
-            }
-        }
-    </style>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="navbar">
-        <a href="index.html">Add Entry</a>
         <a href="dashboard.html">Dashboard</a>
+        <a href="form.html">Add Entry</a>
+        <a href="#" id="newPharmacyBtn">Add New Pharmacy</a>
+        <a href="product-benefits.html">Product Benefits</a>
     </div>
 
     <h1 style="text-align: center;">Dashboard</h1>
-    <table id="dashboardTable">
-        <thead>
-            <tr>
-                <th>Team Name</th>
-                <th>Province</th>
-                <th>Pharmacy Name</th>
-                <th>Contact Number</th>
-                <th>Address</th>
-                <th>Sales Qty</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamic rows -->
-        </tbody>
-    </table>
+
+    <div class="dashboard-grid">
+        <!-- Row 1 -->
+        <div class="grid-item">
+            <p id="preRegisteredEntries">0</p>
+            <h3>Total Entries up to now from Pre-Registered</h3>
+        </div>
+        <div class="grid-item">
+            <p id="newEntries">0</p>
+            <h3>Total Entries up to now from Newly Added</h3>
+        </div>
+        <div class="grid-item">
+            <h3>Pre-Registered Pharmacies Covered by Each Team</h3>
+            <canvas id="preRegisteredTeamChart"></canvas>
+        </div>
+        <div class="grid-item">
+            <h3>New Pharmacies Covered by Each Team</h3>
+            <canvas id="newPharmaciesTeamChart"></canvas>
+        </div>
+    
+        <!-- Row 2 -->
+        <div class="grid-item">
+            <h3>Team Performance</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Team Name</th>
+                        <th>No. of Productive Outlets Covered</th>
+                        <th>Province</th>
+                    </tr>
+                </thead>
+                <tbody id="teamPerformanceTable">
+                    <!-- Dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+        <div class="grid-item">
+            <h3>Pre-Registered Pharmacies Covered in Each Province</h3>
+            <canvas id="preRegisteredProvinceChart"></canvas>
+        </div>
+        <div class="grid-item">
+            <h3>New Pharmacies Covered in Each Province</h3>
+            <canvas id="newPharmaciesProvinceChart"></canvas>
+        </div>
+        <div class="grid-item">
+            <h3>Province-Wise Outlets</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Province</th>
+                        <th>No. of Outlets Covered</th>
+                        <th>Team Name</th>
+                    </tr>
+                </thead>
+                <tbody id="provincePerformanceTable">
+                    <!-- Dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feel Good Dashboard - Add Entry</title>
+    <link rel="stylesheet" href="styles.css">
+
+   
+    
+</head>
+<body>
+    <!-- Main Content -->
+    <div id="contentContainer">
+        <div class="navbar">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="form.html">Add Entry</a>
+            <a href="#" id="newPharmacyBtn">Add New Pharmacy</a>
+
+            <a href="product-benefits.html">Product Benefits</a>
+
+        </div>
+
+        <h1 style="text-align: center;">Feel Good Dashboard</h1>
+        <!-- Pre-Registered Entry Form -->
+<form id="addEntryForm">
+    <select id="teamName" required>
+        <option value="" disabled selected>Select Team</option>
+        <option value="TeamA">Team A</option>
+        <option value="TeamB">Team B</option>
+        <option value="TeamC">Team C</option>
+        <option value="TeamD">Team D</option>
+        <option value="TeamE">Team E</option>
+        <option value="TeamF">Team F</option>
+        <option value="TeamG">Team G</option>
+        <option value="TeamH">Team H</option>
+        <option value="TeamI">Team I</option>
+        <option value="TeamJ">Team J</option>
+    </select> 
+    <select id="province" required>
+        <option value="" disabled selected>Select Province</option>
+        <option value="Central">Central</option>
+        <option value="Eastern">Eastern</option>
+        <option value="Northern">Northern</option>
+        <option value="North Central">North Central</option>
+        <option value="North Western">North Western</option>
+        <option value="Sabaragamuwa">Sabaragamuwa</option>
+        <option value="Southern">Southern</option>
+        <option value="Uva">Uva</option>
+        <option value="Western">Western</option>
+    </select>            
+    <input type="text" id="pharmacyName" placeholder="Pharmacy Name" required>
+    <input type="text" id="contactNumber" placeholder="Contact Number" required>
+    <input type="text" id="address" placeholder="Address" required>
+    
+    <h4>Sales Quantity:</h4>
+    <div id="skuList">
+        <div class="sku-container">
+            <label>320ml No added sugar Vanilla</label>
+            <input type="number" class="sku-input" data-sku="320ml No added sugar Vanilla" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml No added sugar Chocolate</label>
+            <input type="number" class="sku-input" data-sku="320ml No added sugar Chocolate" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Vegan Passion Fruit</label>
+            <input type="number" class="sku-input" data-sku="320ml Vegan Passion Fruit" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Vegan Chocolate</label>
+            <input type="number" class="sku-input" data-sku="320ml Vegan Chocolate" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Frozen Yourt Mango</label>
+            <input type="number" class="sku-input" data-sku="320ml Frozen Yourt Mango" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Frozen Yougurt Mixed Berry</label>
+            <input type="number" class="sku-input" data-sku="320ml Frozen Yougurt Mixed Berry" placeholder="Count" min="0">
+        </div>
+    </div>
+
+    <input type="text" id="remarks" placeholder="Remarks (optional)">
+    <button type="submit">Add Entry</button>
+</form>
+
+<!-- New Pharmacy Form -->
+<form id="addPharmacyForm" style="display: none;">
+    <h2>Add New Pharmacy</h2>
+    <select id="pharmacyTeamName" required>
+        <option value="" disabled selected>Select Team</option>
+        <option value="TeamA">Team A</option>
+        <option value="TeamB">Team B</option>
+        <option value="TeamC">Team C</option>
+        <option value="TeamD">Team D</option>
+        <option value="TeamE">Team E</option>
+        <option value="TeamF">Team F</option>
+        <option value="TeamG">Team G</option>
+        <option value="TeamH">Team H</option>
+        <option value="TeamI">Team I</option>
+        <option value="TeamJ">Team J</option>
+    </select>
+    <select id="newPharmacyName" required>
+        <option value="" disabled selected>Select Province</option>
+        <option value="Central">Central</option>
+        <option value="Eastern">Eastern</option>
+        <option value="Northern">Northern</option>
+        <option value="North Central">North Central</option>
+        <option value="North Western">North Western</option>
+        <option value="Sabaragamuwa">Sabaragamuwa</option>
+        <option value="Southern">Southern</option>
+        <option value="Uva">Uva</option>
+        <option value="Western">Western</option>
+    </select> 
+    <input type="text" id="newPharmacyName" placeholder="New Pharmacy Name" required>
+    <input type="text" id="newPharmacyContact" placeholder="Contact Number" required>
+    <input type="text" id="newPharmacyAddress" placeholder="Address" required>
+    
+    <h4>Sales Quantity:</h4>
+    <div id="newPharmacyskuList">
+        <div class="sku-container">
+            <label>320ml No added sugar Vanilla</label>
+            <input type="number" class="sku-input" data-sku="320ml No added sugar Vanilla" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml No added sugar Chocolate</label>
+            <input type="number" class="sku-input" data-sku="320ml No added sugar Chocolate" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Vegan Passion Fruit</label>
+            <input type="number" class="sku-input" data-sku="320ml Vegan Passion Fruit" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Vegan Chocolate</label>
+            <input type="number" class="sku-input" data-sku="320ml Vegan Chocolate" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Frozen Yourt Mango</label>
+            <input type="number" class="sku-input" data-sku="320ml Frozen Yourt Mango" placeholder="Count" min="0">
+        </div>
+        <div class="sku-container">
+            <label>320ml Frozen Yougurt Mixed Berry</label>
+            <input type="number" class="sku-input" data-sku="320ml Frozen Yougurt Mixed Berry" placeholder="Count" min="0">
+        </div>
+    </div>
+
+    <input type="text" id="newRemarks" placeholder="Remarks (optional)">
+    <button type="submit">Add New Pharmacy</button>
+</form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="script.js"></script>
+    
+</body>
+</html>
+

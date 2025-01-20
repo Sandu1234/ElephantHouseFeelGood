@@ -3,231 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feel Good Dashboard - Add Entry</title>
+    <title>Feel Good Onboarding</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Onboarding Page Styles */
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
         }
-    
-        /* Navbar */
-        .navbar {
-            background-color: #1CA498; /* Main color */
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-        }
-    
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-    
-        /* Form Section */
-        form {
-            margin: 20px auto;
-            padding: 40px; /* Add padding around the form */
-            border: 2px solid #1CA498; /* Main color for the border */
-            background: #FAD968; /* Sub color (light background) */
-            max-width: 90%; /* Adjust for smaller screens */
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-    
-        form h4 {
-            color: #1CA498; /* Main color for headings */
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-    
-        form input, form button, form select {
-            display: block;
+
+        .onboarding-container {
+            position: relative;
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background: white; /* Keep input background white for readability */
-        }
-    
-        form input:focus, form select:focus {
-            border-color: #1CA498; /* Highlight with main color */
-            outline: none;
-            box-shadow: 0 0 4px rgba(28, 164, 152, 0.5); /* Add a soft glow */
-        }
-    
-        form button {
-            background-color: #B51F67; /* Sub color for button */
-            color: white; /* Text color */
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-    
-        form button:hover {
-            background-color: #8F174F; /* Darker shade of the button color */
-        }
-    
-        /* SKU Container */
-        .sku-container {
+            height: 100vh; /* Full viewport height */
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin: 10px 0;
-        }
-    
-        .sku-container label {
-            font-size: 18px;
-            color: black; /* Main color for labels */
-            flex: 1;
-        }
-    
-        .sku-container input {
-            width: 80px;
-            text-align: center;
-            flex-shrink: 0;
+            justify-content: center;
+            animation: zoomIn 5s forwards; /* Apply zoom-in animation */
         }
 
-        #imageContainer img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
+        .onboarding-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the entire screen */
         }
 
-        #contentContainer {
-            display: none; /* Hide the content initially */
-        }
-    
-        /* Responsive Styles for Mobile */
-        @media (max-width: 768px) {
-            form {
-                padding: 30px;
+        /* Zoom-in animation */
+        @keyframes zoomIn {
+            0% {
+                transform: scale(1); /* Initial scale */
+                opacity: 1; /* Fully visible */
             }
-    
-            form input, form button, form select {
-                font-size: 14px;
-                padding: 10px;
+            50% {
+                transform: scale(1.1); /* Slightly zoomed in */
+                opacity: 1;
             }
-    
-            .sku-container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-    
-            .sku-container label {
-                margin-bottom: 5px;
-            }
-    
-            .sku-container input {
-                width: 100%; /* Expand input width for smaller screens */
-            }
-    
-            form button {
-                font-size: 16px;
-            }
-        }
-    
-        @media (max-width: 480px) {
-            form {
-                padding: 20px;
-            }
-    
-            form input, form button, form select {
-                font-size: 12px;
-                padding: 8px;
-            }
-    
-            .sku-container label {
-                font-size: 12px;
-            }
-    
-            form button {
-                font-size: 14px;
+            100% {
+                transform: scale(1.2); /* Fully zoomed in */
+                opacity: 0; /* Fade out */
             }
         }
     </style>
-    
 </head>
 <body>
-    <!-- Fullscreen Image -->
-    <div id="imageContainer">
-        <img src="img/PHOTO-2025-01-20-11-17-32.jpg" alt="Welcome Image">
+    <!-- Onboarding Image -->
+    <div class="onboarding-container">
+        <img src="img/onboard.jpg" alt="Onboarding Image">
     </div>
 
-    <!-- Main Content -->
-    <div id="contentContainer">
-        <div class="navbar">
-            <a href="index.html">Add Entry</a>
-            <a href="dashboard.html">Dashboard</a>
-        </div>
-
-        <h1 style="text-align: center;">Feel Good Dashboard</h1>
-        <form id="addEntryForm">
-            <input type="text" id="teamName" placeholder="Team Name" required>
-            <input type="text" id="province" placeholder="Province" required>
-            <input type="text" id="pharmacyName" placeholder="Pharmacy Name" required>
-            <input type="text" id="contactNumber" placeholder="Contact Number" required>
-            <input type="text" id="address" placeholder="Address" required>
-
-            <h4>Sales Quantity:</h4>
-            <div id="skuList">
-                <div class="sku-container">
-                    <label>320ml No added sugar Vanilla</label>
-                    <input type="number" class="sku-input" data-sku="320ml No added sugar Vanilla" placeholder="Count" min="0">
-                </div>
-                <div class="sku-container">
-                    <label>320ml No added sugar Chocolate</label>
-                    <input type="number" class="sku-input" data-sku="320ml No added sugar Chocolate" placeholder="Count" min="0">
-                </div>
-                <div class="sku-container">
-                    <label>320ml Vegan Passion Fruit</label>
-                    <input type="number" class="sku-input" data-sku="320ml Vegan Passion Fruit" placeholder="Count" min="0">
-                </div>
-                <div class="sku-container">
-                    <label>320ml Vegan Chocolate</label>
-                    <input type="number" class="sku-input" data-sku="320ml Vegan Chocolate" placeholder="Count" min="0">
-                </div>
-            </div>
-
-            <button type="submit">Add Entry</button>
-        </form>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="script.js"></script>
     <script>
-        // Show Image for 3 seconds or until the user scrolls
-        const imageContainer = document.getElementById('imageContainer');
-        const contentContainer = document.getElementById('contentContainer');
-
-        // Hide the image after 3 seconds
+        // Redirect to dashboard after 5 seconds
         setTimeout(() => {
-            imageContainer.style.opacity = '0';
-            setTimeout(() => {
-                imageContainer.style.display = 'none';
-                contentContainer.style.display = 'block';
-            }, 1000); // Wait for the fade-out effect
-        }, 3000);
+            window.location.href = 'dashboard.html'; // Replace with the correct dashboard page path
+        }, 5000);
 
-        // Hide the image on scroll
+        // Redirect on user scroll
         window.addEventListener('scroll', () => {
-            imageContainer.style.opacity = '0';
-            setTimeout(() => {
-                imageContainer.style.display = 'none';
-                contentContainer.style.display = 'block';
-            }, 1000); // Wait for the fade-out effect
+            window.location.href = 'dashboard.html'; // Replace with the correct dashboard page path
         });
     </script>
 </body>
