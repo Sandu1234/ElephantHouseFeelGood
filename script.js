@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", async () => {
+
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAxAkWR8Y0PrGxdMooejekrQYYjsTz9p1Y",
@@ -337,3 +339,4 @@ function createProvinceCharts(entries, pharmacies) {
 // Function to Initialize the Dashboard
 fetchAndUpdateDashboard();
 
+});
